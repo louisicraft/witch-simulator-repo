@@ -5,24 +5,29 @@ using UnityEngine.UI;
 
 public class ContractScript : MonoBehaviour
 {
-    public string contractName;
+    
+    [HideInInspector]
     public int whatSpawnUsed;
+    [HideInInspector]
     public float contractTimer;
-    public int contractPoints;
-
+    [HideInInspector]
     public ContractManager contractManager;
 
     private bool activateTimer;
 
+    public string contractName;
+    public int contractPoints;
     public Slider contractTimeSlider;
 
-    private void Start()
+    public float minTimer;
+    public float maxTimer;
+   
+    private void Awake()
     {
+        contractTimer = Random.Range(minTimer, maxTimer);
         contractTimeSlider.maxValue = contractTimer;
         StartCoroutine(startTimer());
     }
-
-    //spaeter noch den Timer hier einbauen
 
     private IEnumerator startTimer()
     {
@@ -30,6 +35,7 @@ public class ContractScript : MonoBehaviour
         activateTimer = true;
     }
 
+    
     public void Update()
     {
         if (activateTimer)
@@ -43,11 +49,13 @@ public class ContractScript : MonoBehaviour
         }
         
     }
+
+    //STOP TIMER WHEN DEACTIVATED
     public void DeleteContract()
     {
         contractManager.contractSpawns[whatSpawnUsed].GetComponent<ContractSpawnScript>().isSpawnFree = true;
-        contractManager.AddFail();  
-        Destroy(gameObject);
-        //Instantiate destroz effect of contract
+        contractManager.AddFail();
+        gameObject.SetActive(false);
+        //Instantiate destroy effect of contract
     }
 }

@@ -84,7 +84,6 @@ public class CookingPot : MonoBehaviour
             else
             {
                 soupIndex = water;
-                print("notequal");
             }        
         }
     }

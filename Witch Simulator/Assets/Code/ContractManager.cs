@@ -28,11 +28,12 @@ public class ContractManager : MonoBehaviour
     [HideInInspector]
     public List<Transform> activeContractVisuals;
 
-    public float minTimeBtwContracts;
-    public float maxTimeBtwContracts;
-    private float timeBetweenContracts;
 
     //contract timer
+    public float minTimeBtwContracts;
+    public float maxTimeBtwContracts;
+
+    private float timeBetweenContracts;   
     private float timer;
     private float contractTimer;
 
@@ -45,9 +46,14 @@ public class ContractManager : MonoBehaviour
     public int failedContracts = 0;
     private int failLimit = 4;
     public List<Image> failedCrosses;
+    public Canvas looseCanvas;
 
     //points display-text
     private TextMeshProUGUI pointsText;
+
+    //difficulty and loop
+    private int difficulty = 0;
+
 
     void Start()
     {
@@ -68,32 +74,65 @@ public class ContractManager : MonoBehaviour
         }                
     }
      
-    public void AddContract()
+    public void IncreaseDifficulty()
     {
         
-        //zufaellige zahl fuer contract auswaehlen
-        Transform _temp;
-        int temp;
+    }
+
+    public void RestartLoop()
+    {
+        foreach (Transform child in transform)
+        {
+            if (child.GetComponent<ContractScript>())
+            {
+                child.gameObject.SetActive(false);
+            }
+        }
+
+        failedContracts = 0;
+        looseCanvas.enabled = false;
+        dead = false;
+        contractTimer = timer + timeBetweenContracts;
+
+    }
+
+    public void AddContract()
+    {
+        //temporary variables
+        int randomTemp;
+        string searchedName;
+        ContractScript cScript;
 
         int i = 0;
         //nur neuen auftrag nehmen wenn durch alle spawns gelooped wurde und keienr frei ist       
         foreach (Transform isSpawnFree in contractSpawns)
         {
             if (contractSpawns[i].GetComponent<ContractSpawnScript>().isSpawnFree == true)
-            {
-                print("contract added");               
-                temp = Random.Range(0, 2);
+            {               
+                randomTemp = Random.Range(0, 2);
+                searchedName = contracts[randomTemp].name;
+                Debug.Log(searchedName);
+                Debug.Log("freier slot gefunden");
 
-                _temp = (Instantiate(contracts[temp].contractVisuals, contractSpawns[i].position, Quaternion.identity, this.transform).transform);
-                _temp.GetComponent<ContractScript>().contractName = contracts[temp].name;
-                _temp.GetComponent<ContractScript>().whatSpawnUsed = i;
-                _temp.GetComponent<ContractScript>().contractTimer = Random.Range(contracts[temp].minTimer, contracts[temp].maxTimer);
-                _temp.GetComponent<ContractScript>().contractManager = gameObject.GetComponent<ContractManager>();
-                _temp.GetComponent<ContractScript>().contractPoints = contracts[temp].points;
-
-                activeContractVisuals.Add(_temp);
-
+                foreach (Transform child in transform)
+                {
+                    if (child.GetComponent<ContractScript>())
+                    {
+                        Debug.Log("contract gefunden");
+                        if (child.GetComponent<ContractScript>().contractName == searchedName)
+                        {
+                            Debug.Log("PASSENDEN gefunden");
+                            child.gameObject.SetActive(true);
+                            child.position = contractSpawns[i].position;
+                            cScript = child.GetComponent<ContractScript>();
+                            cScript.whatSpawnUsed = i;
+                            //maybe delete later...
+                            cScript.contractManager = gameObject.GetComponent<ContractManager>();
+                        }
+                    }
+                }            
                 contractSpawns[i].GetComponent<ContractSpawnScript>().isSpawnFree = false;
+
                 i++;
                 return;
             }
@@ -142,24 +181,19 @@ public class ContractManager : MonoBehaviour
         failedContracts++;       
         if(failedContracts >= failLimit)
         {
-            Die();
-            
+            Die();            
         }
     }
 
     public void Die()
     {
         //loose and fail the mission
-        //get some kind of punishment or less bonus
         if (dead == false)
-        {
-            Debug.Log("ded");
-         
+        {   
             dead = true;
             //Death effect
-            //looseCanvas.enabled = true;
+            looseCanvas.enabled = true;
             Time.timeScale = 0;
         }
     }
-
 }

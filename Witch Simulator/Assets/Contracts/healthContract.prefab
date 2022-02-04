@@ -167,12 +167,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e6643e65277f564a8a0fb5706fb8524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  contractName: 
   whatSpawnUsed: 0
   contractTimer: 0
-  contractPoints: 0
   contractManager: {fileID: 0}
+  contractName: health
+  contractPoints: 3
   contractTimeSlider: {fileID: 344695949387601503}
+  minTimer: 6
+  maxTimer: 8
 --- !u!1 &8981319677562118496
 GameObject:
   m_ObjectHideFlags: 0
